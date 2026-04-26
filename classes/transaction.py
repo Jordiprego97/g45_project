@@ -1,3 +1,4 @@
+#Parte da Sofia
 from classes.gclass import Gclass
 from classes.manufacturer import Manufacturer
 from classes.suplier import Suplier
