@@ -1,3 +1,4 @@
+#Parte do Filipe
 import sys
 import datetime
 import sqlite3
