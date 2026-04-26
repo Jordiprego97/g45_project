@@ -1,3 +1,4 @@
+#Parte do Jordi
 from classes.gclass import Gclass
 from classes.model import Model
 
