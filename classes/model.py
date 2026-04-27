@@ -1,4 +1,4 @@
-#Parte da Matilde
+#Parte Matilde
 from classes.gclass import Gclass
 class Model(Gclass):
    
