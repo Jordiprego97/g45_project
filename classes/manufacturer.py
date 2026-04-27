@@ -1,4 +1,4 @@
-#Parte do Jordi
+#Parte Jordi Prego
 from classes.gclass import Gclass
 from classes.model import Model
 
