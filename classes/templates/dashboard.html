@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4 fw-bold text-dark">Painel de Controlo Geral</h2>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card card-stats bg-white border-start border-primary border-4 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-muted text-uppercase small">Modelos</h6>
+                    <h3 class="fw-bold text-dark mb-0">{{ stats.total_models }}</h3>
+                </div>
+                <i class="fa-solid fa-cubes fa-2x text-primary opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stats bg-white border-start border-success border-4 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-muted text-uppercase small">Fornecedores</h6>
+                    <h3 class="fw-bold text-dark mb-0">{{ stats.total_suppliers }}</h3>
+                </div>
+                <i class="fa-solid fa-truck fa-2x text-success opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stats bg-white border-start border-warning border-4 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-muted text-uppercase small">Fabricantes</h6>
+                    <h3 class="fw-bold text-dark mb-0">{{ stats.total_manufacturers }}</h3>
+                </div>
+                <i class="fa-solid fa-industry fa-2x text-warning opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-stats bg-white border-start border-danger border-4 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-muted text-uppercase small">Volume Total</h6>
+                    <h3 class="fw-bold text-dark mb-0">{{ "%.2f"|format(stats.total_amount) }} €</h3>
+                </div>
+                <i class="fa-solid fa-wallet fa-2x text-danger opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-history me-2 text-secondary"></i>Últimas 5 Transações</h5>
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fabricante</th>
+                <th>Fornecedor</th>
+                <th>Data</th>
+                <th class="text-end">Montante</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in recent_transactions %}
+            <tr>
+                <td><span class="text-muted">#{{ t.id }}</span></td>
+                <td><span class="fw-semibold">{{ t.manufacturer_name }}</span></td>
+                <td>{{ t.suplier_title }}</td>
+                <td>{{ t.date }}</td>
+                <td class="text-end fw-bold text-success">{{ "%.2f"|format(t.amount) }} €</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fa-solid fa-truck me-2"></i>Gestão de Fornecedores
+                    </h4>
+                </div>
+                
+                <div class="card-body p-4 bg-light">
+                    <form method="POST" action="/supliers">
+                        {% if fornecedor %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-secondary">
+                                    <i class="fa-solid fa-hashtag me-1 small"></i> Supplier ID
+                                </label>
+                                <input type="text" class="form-control bg-white border-2 rounded-3 text-muted fw-bold" value="{{ fornecedor.suplier_id }}" readonly>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-font me-1 small"></i> Nome / Título
+                                </label>
+                                <input type="text" class="form-control border-2 rounded-3" value="{{ fornecedor.suplier_title }}">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-tags me-1 small"></i> Categoria
+                                </label>
+                                <input type="text" class="form-control border-2 rounded-3" value="{{ fornecedor.suplier_category }}">
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning text-center rounded-3 shadow-sm">
+                                <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                                Nenhum fornecedor encontrado.
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between gap-1 mb-4 border-bottom pb-3">
+                            <button type="submit" name="botao" value="Edit" class="btn btn-outline-success btn-sm px-3 rounded-pill">Edit</button>
+                            <button type="submit" name="botao" value="Delete" class="btn btn-outline-danger btn-sm px-3 rounded-pill">Delete</button>
+                            <button type="submit" name="botao" value="Insert" class="btn btn-outline-primary btn-sm px-3 rounded-pill">Insert</button>
+                            <button type="submit" name="botao" value="Save" class="btn btn-secondary btn-sm px-3 rounded-pill" disabled>Save</button>
+                            <button type="submit" name="botao" value="Cancel" class="btn btn-secondary btn-sm px-3 rounded-pill" disabled>Cancel</button>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="submit" name="botao" value="First" class="btn btn-dark px-3 rounded-3 shadow-sm"><i class="fa-solid fa-backward-fast"></i></button>
+                            <button type="submit" name="botao" value="Previous" class="btn btn-success px-4 rounded-3 shadow-sm fw-semibold"><i class="fa-solid fa-chevron-left me-1"></i> Anterior</button>
+                            <button type="submit" name="botao" value="Next" class="btn btn-success px-4 rounded-3 shadow-sm fw-semibold">Seguinte <i class="fa-solid fa-chevron-right ms-1"></i></button>
+                            <button type="submit" name="botao" value="Last" class="btn btn-dark px-3 rounded-3 shadow-sm"><i class="fa-solid fa-forward-fast"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

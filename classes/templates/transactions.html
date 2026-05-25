@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-danger text-white text-center py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fa-solid fa-money-bill-transfer me-2"></i>Gestão de Transações
+                    </h4>
+                </div>
+                
+                <div class="card-body p-4 bg-light">
+                    <form method="POST" action="/transactions">
+                        {% if transacao %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-secondary">
+                                    <i class="fa-solid fa-hashtag me-1 small"></i> ID da Transação
+                                </label>
+                                <input type="text" class="form-control bg-white border-2 rounded-3 text-muted fw-bold" value="{{ transacao.transaction_id }}" readonly>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-industry me-1 small"></i> Fabricante
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-2 border-end-0 text-muted small fw-bold">ID {{ transacao.manufacturer_id }}</span>
+                                    <input type="text" class="form-control border-2 bg-white" value="{{ manufacturer_name }}" readonly>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-truck me-1 small"></i> Fornecedor
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-2 border-end-0 text-muted small fw-bold">ID {{ transacao.suplier_id }}</span>
+                                    <input type="text" class="form-control border-2 bg-white" value="{{ suplier_title }}" readonly>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-calendar me-1 small"></i> Data da Transação
+                                </label>
+                                <input type="text" class="form-control border-2 rounded-3" value="{{ transacao.transaction_date }}">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-euro-sign me-1 small"></i> Montante
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control border-2 rounded-3 border-end-0 fw-bold text-danger text-end" value="{{ '%.2f'|format(transacao.amount) }}">
+                                    <span class="input-group-text bg-white border-2 border-start-0 fw-bold text-danger">€</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning text-center rounded-3 shadow-sm">
+                                <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                                Nenhuma transação registada.
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between gap-1 mb-4 border-bottom pb-3">
+                            <button type="submit" name="botao" value="Edit" class="btn btn-outline-danger btn-sm px-3 rounded-pill">Edit</button>
+                            <button type="submit" name="botao" value="Delete" class="btn btn-outline-dark btn-sm px-3 rounded-pill">Delete</button>
+                            <button type="submit" name="botao" value="Insert" class="btn btn-outline-success btn-sm px-3 rounded-pill">Insert</button>
+                            <button type="submit" name="botao" value="Save" class="btn btn-secondary btn-sm px-3 rounded-pill" disabled>Save</button>
+                            <button type="submit" name="botao" value="Cancel" class="btn btn-secondary btn-sm px-3 rounded-pill" disabled>Cancel</button>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="submit" name="botao" value="First" class="btn btn-dark px-3 rounded-3 shadow-sm"><i class="fa-solid fa-backward-fast"></i></button>
+                            <button type="submit" name="botao" value="Previous" class="btn btn-danger px-4 rounded-3 shadow-sm fw-semibold"><i class="fa-solid fa-chevron-left me-1"></i> Anterior</button>
+                            <button type="submit" name="botao" value="Next" class="btn btn-danger px-4 rounded-3 shadow-sm fw-semibold">Seguinte <i class="fa-solid fa-chevron-right ms-1"></i></button>
+                            <button type="submit" name="botao" value="Last" class="btn btn-dark px-3 rounded-3 shadow-sm"><i class="fa-solid fa-forward-fast"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
