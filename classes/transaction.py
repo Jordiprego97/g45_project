@@ -61,3 +61,20 @@ class Transaction(Gclass):
     @amount.setter
     def amount(self, amount):
         self._amount = amount
+    
+    def apply_discount(self, percentage):
+        
+        percentage = float(percentage)
+        if 0 < percentage <= 100:
+            desconto = self._amount * (percentage / 100)
+            self.amount = self._amount - desconto 
+            return True
+        return False
+    def apply_tax(self, percentage):
+        
+        percentage = float(percentage)
+        if percentage > 0:
+            taxa = self._amount * (percentage / 100)
+            self.amount = self._amount + taxa
+            return True
+        return False
