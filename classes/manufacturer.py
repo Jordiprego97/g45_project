@@ -51,6 +51,25 @@ class Manufacturer(Gclass):
     @property
     def model_id(self):
         return self._model_id
+    def total_fabricantes_registados(self):
+        return len(Manufacturer.lst)
+    def calcular_anos_existencia(self):
+        try:
+            ano_criacao = int(str(self.created_date)[:4])
+            anos = 2026 - ano_criacao
+            return anos
+        except (ValueError, TypeError):
+            return 0
+    def obter_contagem_por_ano(self):
+        anos_contagem = {}
+        for f_id in Manufacturer.lst:
+            fab = Manufacturer.obj[f_id]
+            try:
+                ano = str(fab.created_date)[:4]
+                anos_contagem[ano] = anos_contagem.get(ano, 0) + 1
+            except:
+                continue
+        return anos_contagem
     
 
     
