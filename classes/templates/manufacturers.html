@@ -1,22 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container py-4">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm mb-4" role="alert">
-                    {% if category == 'danger' %}
-                        <i class="fa-solid fa-circle-xmark me-2"></i>
-                    {% else %}
-                        <i class="fa-solid fa-circle-check me-2"></i>
-                    {% endif %}
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -27,89 +11,113 @@
                 </div>
                 
                 <div class="card-body p-4 bg-light">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-3 small" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
                     <form method="POST" action="/manufacturers">
-                        {% if fabricante or modo == 'inserir' %}
+                        <input type="hidden" name="modo_atual" value="{{ modo }}">
+
+                        {% if modo == 'inserir' or fabricante %}
+                            
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-secondary">
                                     <i class="fa-solid fa-hashtag me-1 small"></i> ID do Fabricante
                                 </label>
-                                <input type="text" class="form-control bg-white border-2 rounded-3 text-muted fw-bold" 
-                                       value="{{ fabricante.manufacturer_id if fabricante else 'Automático (Novo)' }}" readonly>
-                                <input type="hidden" name="manufacturer_id_input" value="{{ fabricante.manufacturer_id if fabricante else '' }}">
+                                <input type="text" name="manufacturer_id_input" class="form-control bg-white border-2 rounded-3 text-muted fw-bold" 
+                                       value="{{ fabricante.manufacturer_id if fabricante else '' }}" readonly>
                             </div>
-
+                            
                             <div class="mb-3">
-                                <label class="form-label fw-semibold text-secondary">
-                                    <i class="fa-solid fa-industry me-1 small"></i> Nome do Fabricante
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-building me-1 small"></i> Nome do Fabricante
                                 </label>
-                                <input type="text" name="manufacturer_name_input" class="form-control bg-white border-2 rounded-3" 
-                                       value="{{ fabricante.manufacturer_name if fabricante else '' }}" {% if modo == 'ver' %} readonly {% endif %} required>
+                                <input type="text" name="manufacturer_name_input" class="form-control border-2 rounded-3" 
+                                       value="{{ fabricante.manufacturer_name if fabricante else '' }}" 
+                                       {% if modo == 'ver' %}readonly{% endif %} required>
                             </div>
 
+                            {% if modo != 'inserir' %}
                             <div class="mb-3">
-                                <label class="form-label fw-semibold text-secondary">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-calendar-days me-1 small"></i> Data de Criação
+                                </label>
+                                <input type="text" class="form-control border-2 rounded-3 text-muted bg-white" value="{{ fabricante.created_date }}" readonly>
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-dark">
                                     <i class="fa-solid fa-cubes me-1 small"></i> Modelo Associado
                                 </label>
                                 {% if modo == 'ver' %}
-                                    <input type="text" class="form-control bg-white border-2 rounded-3" value="{{ m_name }}" readonly>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-2 border-end-0 text-muted small fw-bold">ID {{ fabricante.model_id }}</span>
+                                        <input type="text" class="form-control border-2 bg-white text-muted" value="{{ m_name }}" readonly>
+                                    </div>
                                 {% else %}
-                                    <select name="model_id_input" class="form-select bg-white border-2 rounded-3" required>
-                                        {% for m in modelos %}
-                                            <option value="{{ m.model_id }}" {% if fabricante and fabricante.model_id == m.model_id %} selected {% endif %}>
-                                                {{ m.model_info }}
+                                    <select name="model_id_input" class="form-select border-2 rounded-3" required>
+                                        <option value="" disabled selected>Escolha um modelo...</option>
+                                        {% for mod in modelos %}
+                                            <option value="{{ mod.model_id }}" {% if fabricante and fabricante.model_id == mod.model_id %}selected{% endif %}>
+                                                {{ mod.model_info }} (ID: {{ mod.model_id }})
                                             </option>
                                         {% endfor %}
                                     </select>
                                 {% endif %}
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold text-secondary">
-                                    <i class="fa-solid fa-calendar-days me-1 small"></i> Data de Criação
+                            {% if modo == 'ver' %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-hourglass-half me-1 small"></i> Anos de Existência
                                 </label>
-                                <input type="text" class="form-control bg-white border-2 rounded-3 text-muted" 
-                                       value="{{ fabricante.created_date if fabricante else 'Definida ao Guardar' }}" readonly>
+                                <input type="text" class="form-control bg-white border-2 rounded-3 text-muted" value="{{ fabricante.calcular_anos_existencia() }} anos" readonly>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="fa-solid fa-list-ol me-1 small"></i> Total Registados
+                                </label>
+                                <input type="text" class="form-control bg-white border-2 rounded-3 text-muted" value="{{ fabricante.total_fabricantes_registados() }}" readonly>
+                            </div>
+
+                            {% if grafico %}
+                            <div class="mb-4 mt-4 p-3 bg-white border-2 rounded-4 text-center shadow-sm">
+                                <img src="data:image/png;base64,{{ grafico }}" class="img-fluid" alt="Evolução de Fabricantes">
+                            </div>
+                            {% endif %}
+                            
+                            {% endif %}
+
                         {% else %}
-                            <div class="alert alert-warning text-center my-4 rounded-3 shadow-sm" role="alert">
-                                <i class="fa-solid fa-circle-exclamation me-2 fs-5"></i> Nenhum registo encontrado ou base de dados vazia.
+                            <div class="alert alert-warning text-center rounded-3 shadow-sm my-4">
+                                <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+                                Nenhum fabricante encontrado.
                             </div>
                         {% endif %}
 
                         <div class="d-flex justify-content-between gap-1 mb-4 border-bottom pb-3">
-                            <button type="submit" name="botao" value="Edit" class="btn btn-outline-primary btn-sm px-3 rounded-pill" {% if modo != 'ver' or not fabricante %} disabled {% endif %}>
-                                <i class="fa-solid fa-pen me-1"></i>Edit
-                            </button>
-                            <button type="submit" name="botao" value="Delete" class="btn btn-outline-danger btn-sm px-3 rounded-pill" {% if modo != 'ver' or not fabricante %} disabled {% endif %}>
-                                <i class="fa-solid fa-trash me-1"></i>Delete
-                            </button>
-                            <button type="submit" name="botao" value="Insert" class="btn btn-outline-success btn-sm px-3 rounded-pill" {% if modo != 'ver' %} disabled {% endif %}>
-                                <i class="fa-solid fa-plus me-1"></i>New
-                            </button>
-                            
-                            <button type="submit" name="botao" value="Save" class="btn btn-warning text-dark btn-sm px-3 rounded-pill fw-semibold" {% if modo == 'ver' %} disabled {% endif %}>
-                                <i class="fa-solid fa-floppy-disk me-1"></i>Save
-                            </button>
-                            <button type="submit" name="botao" value="Cancel" class="btn btn-secondary btn-sm px-3 rounded-pill" {% if modo == 'ver' %} disabled {% endif %}>
-                                <i class="fa-solid fa-xmark me-1"></i>Cancel
-                            </button>
+                            <button type="submit" name="botao" value="Edit" class="btn btn-outline-warning text-dark btn-sm px-3 rounded-pill" {% if modo != 'ver' or not fabricante %}disabled{% endif %}>Edit</button>
+                            <button type="submit" name="botao" value="Delete" class="btn btn-outline-danger btn-sm px-3 rounded-pill" {% if modo != 'ver' or not fabricante %}disabled{% endif %}>Delete</button>
+                            <button type="submit" name="botao" value="Insert" class="btn btn-outline-success btn-sm px-3 rounded-pill" {% if modo != 'ver' %}disabled{% endif %}>Insert</button>
+                            <button type="submit" name="botao" value="Save" class="btn btn-success btn-sm px-3 rounded-pill" {% if modo == 'ver' %}disabled{% endif %}>Save</button>
+                            <button type="submit" name="botao" value="Cancel" class="btn btn-secondary btn-sm px-3 rounded-pill" {% if modo == 'ver' %}disabled{% endif %}>Cancel</button>
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button type="submit" name="botao" value="First" class="btn btn-dark px-3 rounded-3 shadow-sm" title="Primeiro" {% if modo != 'ver' or not fabricante %} disabled {% endif %}>
-                                <i class="fa-solid fa-backward-fast"></i>
-                            </button>
-                            <button type="submit" name="botao" value="Previous" class="btn btn-warning text-dark px-4 rounded-3 shadow-sm fw-semibold" {% if modo != 'ver' or not fabricante %} disabled {% endif %}>
-                                <i class="fa-solid fa-chevron-left me-1"></i> Anterior
-                            </button>
-                            <button type="submit" name="botao" value="Next" class="btn btn-warning text-dark px-4 rounded-3 shadow-sm fw-semibold" {% if modo != 'ver' or not fabricante %} disabled {% endif %}>
-                                Seguinte <i class="fa-solid fa-chevron-right ms-1"></i>
-                            </button>
-                            <button type="submit" name="botao" value="Last" class="btn btn-dark px-3 rounded-3 shadow-sm" title="Último" {% if modo != 'ver' or not fabricante %} disabled {% endif %}>
-                                <i class="fa-solid fa-forward-fast"></i>
-                            </button>
+                            <button type="submit" name="botao" value="First" class="btn btn-dark px-3 rounded-3 shadow-sm" {% if modo != 'ver' %}disabled{% endif %}><i class="fa-solid fa-backward-fast"></i></button>
+                            <button type="submit" name="botao" value="Previous" class="btn btn-warning text-dark px-4 rounded-3 shadow-sm fw-semibold" {% if modo != 'ver' %}disabled{% endif %}><i class="fa-solid fa-chevron-left me-1"></i> Anterior</button>
+                            <button type="submit" name="botao" value="Next" class="btn btn-warning text-dark px-4 rounded-3 shadow-sm fw-semibold" {% if modo != 'ver' %}disabled{% endif %}>Seguinte <i class="fa-solid fa-chevron-right ms-1"></i></button>
+                            <button type="submit" name="botao" value="Last" class="btn btn-dark px-3 rounded-3 shadow-sm" {% if modo != 'ver' %}disabled{% endif %}><i class="fa-solid fa-forward-fast"></i></button>
                         </div>
-
                     </form>
                 </div>
             </div>

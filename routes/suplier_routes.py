@@ -57,4 +57,35 @@ def listar_supliers():
     if modo != 'inserir' and len(Suplier.lst) > 0:
         fornecedor_atual = Suplier.obj[Suplier.lst[Suplier.pos]]
 
-    return render_template('supliers.html', active_page='suppliers', fornecedor=fornecedor_atual, modo=modo)
+    # --- LÓGICA DO GRÁFICO (Sem funções built-in) ---
+    amounts_dict = {}
+    for t_id in Transaction.lst:
+        t = Transaction.obj[t_id]
+        s_id = t.suplier_id
+        amt = t.amount
+        if s_id in amounts_dict:
+            amounts_dict[s_id] += amt
+        else:
+            amounts_dict[s_id] = amt
+
+    chart_labels = []
+    chart_data = []
+    for s_id in Suplier.lst:
+        sup = Suplier.obj[s_id]
+        name = sup.suplier_title
+        
+        amt = 0.0
+        if s_id in amounts_dict:
+            amt = amounts_dict[s_id]
+            
+        chart_labels.append(name)
+        chart_data.append(amt)
+
+    return render_template(
+        'supliers.html', 
+        active_page='suppliers', 
+        fornecedor=fornecedor_atual, 
+        modo=modo,
+        chart_labels=chart_labels,
+        chart_data=chart_data
+    )

@@ -17,7 +17,7 @@
         {% endif %}
     {% endwith %}
 
-    <div class="row justify-content-center">
+    <div class="row justify-content-center g-4">
         <div class="col-md-6 col-lg-5">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-header bg-success text-white text-center py-3">
@@ -85,11 +85,67 @@
                             <button type="submit" name="botao" value="Next" class="btn btn-success text-white px-4 rounded-3 shadow-sm fw-semibold" {% if modo != 'ver' %} disabled {% endif %}>Seguinte <i class="fa-solid fa-chevron-right ms-1"></i></button>
                             <button type="submit" name="botao" value="Last" class="btn btn-dark px-3 rounded-3 shadow-sm" {% if modo != 'ver' %} disabled {% endif %}><i class="fa-solid fa-forward-fast"></i></button>
                         </div>
-
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fa-solid fa-chart-bar me-2"></i>Análise Estatística
+                    </h4>
+                </div>
+                <div class="card-body p-4 bg-white d-flex align-items-center justify-content-center">
+                    <div style="width: 100%; min-height: 320px; position: relative;">
+                        <canvas id="supplierChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('supplierChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_labels | tojson }},
+                datasets: [{
+                    label: 'Total Transacionado (€)',
+                    data: {{ chart_data | tojson }},
+                    backgroundColor: 'rgba(40, 167, 69, 0.15)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Montante acumulado (€)',
+                            font: { weight: 'bold' }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Fornecedores',
+                            font: { weight: 'bold' }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
