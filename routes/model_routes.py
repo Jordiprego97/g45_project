@@ -16,9 +16,11 @@ def listar_models():
         if acao == 'First':
             Model.pos = 0
         elif acao == 'Previous':
-            if Model.pos > 0: Model.pos -= 1
+            if Model.pos > 0:
+                Model.pos -= 1
         elif acao == 'Next':
-            if Model.pos < len(Model.lst) - 1: Model.pos += 1
+            if Model.pos < len(Model.lst) - 1:
+                Model.pos += 1
         elif acao == 'Last':
             Model.pos = len(Model.lst) - 1
         elif acao == 'Insert':
@@ -29,9 +31,8 @@ def listar_models():
         elif acao == 'Delete':
             if modelo_atual:
                 id_a_apagar = modelo_atual.model_id
-                # VALIDAÇÃO PEDIDA PELO PROFESSOR:
                 em_uso = any(m.model_id == id_a_apagar for m in Manufacturer.obj.values())
-                
+
                 if em_uso:
                     flash(f"Não pode apagar o Modelo {id_a_apagar} porque está a ser usado por Fabricantes!", "danger")
                 else:
@@ -40,21 +41,61 @@ def listar_models():
                     Model.read(Gclass.path)
                     Model.pos = 0
                     flash("Modelo apagado com sucesso.", "success")
+
         elif acao == 'Save':
-            m_info = request.form.get('model_name_input')
+            m_info = request.form.get('model_info_input')
             id_model = request.form.get('model_id_input')
-            if id_model: 
+
+            if id_model:
                 Model.sqlexe(f'UPDATE "Model" SET "model_info" = "{m_info}" WHERE "model_id" = {id_model}')
-            else: 
+            else:
                 Model.sqlexe(f'INSERT INTO "Model" ("model_info") VALUES ("{m_info}")')
+
             Model.reset()
             Model.read(Gclass.path)
             Model.pos = 0
             modo = 'ver'
+
         elif acao == 'Cancel':
             modo = 'ver'
 
     if modo != 'inserir' and len(Model.lst) > 0:
         modelo_atual = Model.obj[Model.lst[Model.pos]]
 
-    return render_template('models.html', active_page='models', modelo=modelo_atual, modo=modo)
+    chart_labels = []
+    chart_values = []
+
+    total_modelos = len(Model.obj)
+    modelos_com_fabricantes = 0
+    modelo_mais_usado = "N/A"
+    max_fabricantes = 0
+
+    for model in Model.obj.values():
+        total = len([
+            manufacturer
+            for manufacturer in Manufacturer.obj.values()
+            if manufacturer.model_id == model.model_id
+        ])
+
+        chart_labels.append(model.model_info)
+        chart_values.append(total)
+
+        if total > 0:
+            modelos_com_fabricantes += 1
+
+        if total > max_fabricantes:
+            max_fabricantes = total
+            modelo_mais_usado = model.model_info
+
+    return render_template(
+        'models.html',
+        active_page='models',
+        modelo=modelo_atual,
+        modo=modo,
+        chart_labels=chart_labels,
+        chart_values=chart_values,
+        total_modelos=total_modelos,
+        modelos_com_fabricantes=modelos_com_fabricantes,
+        modelo_mais_usado=modelo_mais_usado,
+        max_fabricantes=max_fabricantes
+    )

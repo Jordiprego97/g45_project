@@ -11,7 +11,7 @@
                         <i class="fa-solid fa-circle-check me-2"></i>
                     {% endif %}
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -25,31 +25,29 @@
                         <i class="fa-solid fa-cubes me-2"></i>Gestão de Modelos
                     </h4>
                 </div>
-                
+
                 <div class="card-body p-4 bg-light">
                     <form method="POST" action="/models">
-                        
+
                         {% if modelo or modo == 'inserir' %}
-                            
                             <div class="mb-3">
                                 <label class="form-label fw-semibold text-secondary">
                                     <i class="fa-solid fa-hashtag me-1 small"></i> ID do Modelo
                                 </label>
-                                <input type="text" class="form-control bg-white border-2 rounded-3 text-muted fw-bold" 
+                                <input type="text" class="form-control bg-white border-2 rounded-3 text-muted fw-bold"
                                        value="{{ modelo.model_id if modelo else 'Automático (Novo)' }}" readonly>
                                 <input type="hidden" name="model_id_input" value="{{ modelo.model_id if modelo else '' }}">
                             </div>
-                            
+
                             <div class="mb-4">
                                 <label class="form-label fw-semibold text-dark">
                                     <i class="fa-solid fa-info-circle me-1 small"></i> Informação do Modelo
                                 </label>
-                                <input type="text" name="model_info_input" class="form-control border-2 rounded-3" 
-                                       value="{{ modelo.model_info if modelo else '' }}" 
+                                <input type="text" name="model_info_input" class="form-control border-2 rounded-3"
+                                       value="{{ modelo.model_info if modelo else '' }}"
                                        placeholder="Ex: Modelo Standard X"
                                        {% if modo == 'ver' %} readonly {% endif %} required>
                             </div>
-
                         {% else %}
                             <div class="alert alert-warning text-center rounded-3 shadow-sm" role="alert">
                                 <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
@@ -67,7 +65,6 @@
                             <button type="submit" name="botao" value="Insert" class="btn btn-outline-success btn-sm px-3 rounded-pill" {% if modo != 'ver' %} disabled {% endif %}>
                                 <i class="fa-solid fa-plus me-1"></i>Insert
                             </button>
-                            
                             <button type="submit" name="botao" value="Save" class="btn btn-primary btn-sm px-3 rounded-pill" {% if modo == 'ver' %} disabled {% endif %}>
                                 <i class="fa-solid fa-floppy-disk me-1"></i>Save
                             </button>
@@ -77,7 +74,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button type="submit" name="botao" value="First" class="btn btn-dark px-3 rounded-3 shadow-sm" title="Primeiro" {% if modo != 'ver' %} disabled {% endif %}>
+                            <button type="submit" name="botao" value="First" class="btn btn-dark px-3 rounded-3 shadow-sm" {% if modo != 'ver' %} disabled {% endif %}>
                                 <i class="fa-solid fa-backward-fast"></i>
                             </button>
                             <button type="submit" name="botao" value="Previous" class="btn btn-primary px-4 rounded-3 shadow-sm fw-semibold" {% if modo != 'ver' %} disabled {% endif %}>
@@ -86,7 +83,7 @@
                             <button type="submit" name="botao" value="Next" class="btn btn-primary px-4 rounded-3 shadow-sm fw-semibold" {% if modo != 'ver' %} disabled {% endif %}>
                                 Seguinte <i class="fa-solid fa-chevron-right ms-1"></i>
                             </button>
-                            <button type="submit" name="botao" value="Last" class="btn btn-dark px-3 rounded-3 shadow-sm" title="Último" {% if modo != 'ver' %} disabled {% endif %}>
+                            <button type="submit" name="botao" value="Last" class="btn btn-dark px-3 rounded-3 shadow-sm" {% if modo != 'ver' %} disabled {% endif %}>
                                 <i class="fa-solid fa-forward-fast"></i>
                             </button>
                         </div>
@@ -96,5 +93,190 @@
             </div>
         </div>
     </div>
+
+
+    <div class="row mt-5 g-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center h-100">
+                <div class="card-body">
+                    <i class="fa-solid fa-cubes text-primary fs-2"></i>
+                    <h3 class="mt-2 fw-bold">{{ total_modelos }}</h3>
+                    <p class="text-muted mb-0">Total de Modelos</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center h-100">
+                <div class="card-body">
+                    <i class="fa-solid fa-industry text-success fs-2"></i>
+                    <h3 class="mt-2 fw-bold">{{ modelos_com_fabricantes }}</h3>
+                    <p class="text-muted mb-0">Com Fabricantes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center h-100">
+                <div class="card-body">
+                    <i class="fa-solid fa-trophy text-warning fs-2"></i>
+                    <h3 class="mt-2 fw-bold">{{ max_fabricantes }}</h3>
+                    <p class="text-muted mb-0">Máx. Fabricantes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center h-100">
+                <div class="card-body">
+                    <i class="fa-solid fa-star text-danger fs-2"></i>
+                    <div class="mt-2 fw-bold"
+                         title="{{ modelo_mais_usado }}"
+                         style="
+                            font-size:0.80rem;
+                            line-height:1.25;
+                            min-height:70px;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            text-align:center;
+                            word-break:break-word;
+                         ">
+                        {{ modelo_mais_usado }}
+                    </div>
+                    <p class="text-muted mb-0">Modelo Mais Utilizado</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-11 col-lg-10">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fa-solid fa-chart-bar me-2"></i>
+                        Top 10 Modelos com Mais Fabricantes
+                    </h5>
+                </div>
+
+                <div class="card-body bg-white p-4">
+                    <p class="text-muted text-center mb-4">
+                        O gráfico mostra apenas os 10 modelos com mais fabricantes associados.
+                    </p>
+
+                    <div style="height: 500px;">
+                        <canvas id="modelsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+        <div class="card-body">
+            <h5 class="fw-bold">
+                <i class="fa-solid fa-circle-info me-2 text-primary"></i>
+                Análise dos Modelos
+            </h5>
+
+            <p class="mb-0 text-muted">
+                Esta secção apresenta uma análise dos modelos registados no sistema.
+                O gráfico identifica os 10 modelos com maior número de fabricantes
+                associados, permitindo perceber quais os modelos mais utilizados
+                dentro da cadeia de produção e fornecimento.
+            </p>
+        </div>
+    </div>
+
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const originalLabels = {{ chart_labels | tojson }};
+    const originalValues = {{ chart_values | tojson }};
+
+    const chartData = originalLabels.map((label, index) => {
+        return {
+            label: label,
+            value: originalValues[index]
+        };
+    });
+
+    chartData.sort((a, b) => b.value - a.value);
+
+    const topData = chartData.slice(0, 10);
+
+    const labels = topData.map(item => {
+        if (item.label.length > 40) {
+            return item.label.substring(0, 40) + '...';
+        }
+        return item.label;
+    });
+
+    const values = topData.map(item => item.value);
+
+    new Chart(document.getElementById('modelsChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Número de Fabricantes',
+                data: values,
+                backgroundColor: 'rgba(13, 110, 253, 0.70)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 1,
+                borderRadius: 8,
+                barThickness: 28
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return topData[context[0].dataIndex].label;
+                        },
+                        label: function(context) {
+                            return 'Fabricantes: ' + context.raw;
+                        }
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.08)'
+                    }
+                },
+                y: {
+                    ticks: {
+                        autoSkip: false,
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

@@ -26,21 +26,20 @@ def carregar_dados_da_bd():
     except Exception as e:
         print(f"Erro ao ler base de dados: {e}")
 
-# Importar os ficheiros da pasta routes
 from routes.dashboard_routes import dashboard_bp
 from routes.model_routes import model_bp
 from routes.suplier_routes import suplier_bp
 from routes.manufacturer_routes import manufacturer_bp
 from routes.transaction_routes import transaction_bp
 
-# Registar na aplicação Flask
+
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(model_bp)
 app.register_blueprint(suplier_bp)
 app.register_blueprint(manufacturer_bp)
 app.register_blueprint(transaction_bp)
 
-# Carregamento inicial obrigatório
+
 carregar_dados_da_bd()
 
 if __name__ == '__main__':
