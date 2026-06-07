@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 from classes.suplier import Suplier
 from classes.transaction import Transaction
 from classes.gclass import Gclass
@@ -28,17 +28,22 @@ def listar_supliers():
             modo = 'editar'
         elif acao == 'Delete':
             if fornecedor_atual:
-                id_a_apagar = fornecedor_atual.suplier_id
-                em_uso = any(t.suplier_id == id_a_apagar for t in Transaction.obj.values())
+                try:
+                    id_a_apagar = int(fornecedor_atual.suplier_id)
+                    em_uso = any(int(t.suplier_id) == id_a_apagar for t in Transaction.obj.values() if t.suplier_id)
+                except (ValueError, TypeError):
+                    em_uso = False
                 
                 if em_uso:
                     flash(f"Não pode apagar o Fornecedor {id_a_apagar} porque tem transações vinculadas!", "danger")
+                    return redirect(url_for('supliers.listar_supliers'))
                 else:
                     Suplier.sqlexe(f'DELETE FROM "Suplier" WHERE "suplier_id" = {id_a_apagar}')
                     Suplier.reset()
                     Suplier.read(Gclass.path)
                     Suplier.pos = 0
                     flash("Fornecedor removido com sucesso.", "success")
+                    return redirect(url_for('supliers.listar_supliers'))
         elif acao == 'Save':
             s_title = request.form.get('suplier_title_input')
             s_cat = request.form.get('suplier_category_input')

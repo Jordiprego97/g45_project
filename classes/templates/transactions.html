@@ -78,9 +78,8 @@
                                 <label class="form-label fw-semibold text-secondary">
                                     <i class="fa-solid fa-calendar-days me-1 small"></i> Data da Transação
                                 </label>
-                                <input type="date" name="transaction_date_input" class="form-control bg-white border-2 rounded-3" 
-                                       value="{{ data_formatada }}" required
-                                       {% if modo == 'ver' %} readonly {% endif %}>
+                                <input type="date" name="transaction_date_input" class="form-control bg-white border-2 rounded-3 text-dark fw-semibold" 
+                                   value="{{ data_formatada }}" {% if modo == 'ver' %} readonly {% endif %} required>
                             </div>
 
                             <div class="mb-4">

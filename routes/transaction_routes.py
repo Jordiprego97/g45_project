@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 import datetime
 from classes.transaction import Transaction
 from classes.manufacturer import Manufacturer
@@ -17,7 +17,6 @@ def listar_transactions():
     if request.method == 'POST':
         acao = request.form.get('botao')
 
-       
         if acao == 'First':
             Transaction.pos = 0
         elif acao == 'Previous':
@@ -29,16 +28,14 @@ def listar_transactions():
         elif acao == 'Last':
             Transaction.pos = len(Transaction.lst) - 1
             
-        
         elif acao == 'Insert':
             modo = 'inserir'
             transacao_atual = None
         elif acao == 'Edit':
             modo = 'editar'
         elif acao == 'Cancel':
-            modo = 'ver'
+            return redirect(url_for('transactions.listar_transactions'))
             
-        
         elif acao == 'Delete':
             if transacao_atual:
                 id_a_apagar = transacao_atual.transaction_id
@@ -47,41 +44,37 @@ def listar_transactions():
                 Transaction.read(Gclass.path)
                 Transaction.pos = 0
                 flash("Transação removida com sucesso.", "success")
+                return redirect(url_for('transactions.listar_transactions'))
                 
-       
         elif acao == 'Save':
+            t_date = request.form.get('transaction_date_input')
             m_id = request.form.get('manufacturer_id_input')
             s_id = request.form.get('suplier_id_input')
-            t_date = request.form.get('transaction_date_input')
-            amount = request.form.get('amount_input')
+            amt = request.form.get('amount_input')
             id_trans = request.form.get('transaction_id_input')
             
-            if id_trans: 
-                
-                Transaction.sqlexe(f'UPDATE "Transaction" SET "manufacturer_id" = {m_id}, "suplier_id" = {s_id}, "transaction_date" = "{t_date}", "amount" = {amount} WHERE "transaction_id" = {id_trans}')
+            if id_trans:
+                Transaction.sqlexe(f'UPDATE "Transaction" SET "transaction_date" = "{t_date}", "manufacturer_id" = {m_id}, "suplier_id" = {s_id}, "amount" = {amt} WHERE "transaction_id" = {id_trans}')
                 flash("Transação atualizada com sucesso.", "success")
-            else: 
+            else:
+                Transaction.sqlexe(f'INSERT INTO "Transaction" ("transaction_date", "manufacturer_id", "suplier_id", "amount") VALUES ("{t_date}", {m_id}, {s_id}, {amt})')
+                flash("Transação criada com sucesso.", "success")
                 
-                Transaction.sqlexe(f'INSERT INTO "Transaction" ("manufacturer_id", "suplier_id", "transaction_date", "amount") VALUES ({m_id}, {s_id}, "{t_date}", {amount})')
-                flash("Transação registada com sucesso.", "success")
-            
             Transaction.reset()
             Transaction.read(Gclass.path)
             Transaction.pos = 0
-            modo = 'ver'
-
-        
+            return redirect(url_for('transactions.listar_transactions'))
+            
         elif acao == 'Apply Discount':
             pct = request.form.get('discount_percentage_input')
             if pct and transacao_atual:
                 try:
                     pct = float(pct)
-                    if 0 < pct <= 100:
-                        
+                    if pct > 0:
                         valor_simulado = transacao_atual.amount * (1 - pct / 100)
                         flash(f"Simulação: Desconto de {pct}% calculado com sucesso!", "success")
                     else:
-                        flash("Insira uma percentagem de desconto entre 0 e 100.", "danger")
+                        flash("Insira uma percentagem de desconto maior que 0.", "danger")
                 except ValueError:
                     flash("Insira um valor numérico válido para o desconto.", "danger")
                     
@@ -91,7 +84,6 @@ def listar_transactions():
                 try:
                     pct = float(pct)
                     if pct > 0:
-                        
                         valor_simulado = transacao_atual.amount * (1 + pct / 100)
                         flash(f"Simulação: Taxa de {pct}% calculada com sucesso!", "success")
                     else:
@@ -99,28 +91,28 @@ def listar_transactions():
                 except ValueError:
                     flash("Insira um valor numérico válido para a taxa.", "danger")
 
-   
     if modo != 'inserir' and len(Transaction.lst) > 0:
         transacao_atual = Transaction.obj[Transaction.lst[Transaction.pos]]
 
-    
     fabricantes = list(Manufacturer.obj.values())
     fornecedores = list(Suplier.obj.values())
     
-    
     data_formatada = ""
     if transacao_atual and transacao_atual.transaction_date:
-        data_formatada = transacao_atual.transaction_date
+        data_str = str(transacao_atual.transaction_date).strip().replace("/", "-")
+        if len(data_str) >= 10:
+            data_formatada = data_str[:10]  # Corta e deixa apenas AAAA-MM-DD
+        else:
+            data_formatada = data_str
     else:
         data_formatada = datetime.date.today().strftime("%Y-%m-%d")
 
-    
     return render_template(
         'transactions.html', 
         transacao=transacao_atual, 
         modo=modo, 
         fabricantes=fabricantes, 
-        fornecedores=fornecedores, 
+        fornecedores=fornecedores,
         data_formatada=data_formatada,
         valor_simulado=valor_simulado
     )
